@@ -41,3 +41,29 @@ If using Remote Container:
 1. Open VS Code terminal, it should attach to the container
 1. Invoke `fake build --target run`
 1. Open http://localhost:8080/
+
+## 0. display Todos + add new Todo
+
+> These features are already implemented on master branch.
+
+## 1. delete a Todo
+
+1. (Client) in `viewTodo`, just after the `label` add a `button` with `destroy` class
+1. (Shared) add `DeleteCommand` with Id of a Todo (`Guid` type) and `TodoDeleted` event with a `Todo`
+1. (Shared) in `handle` function add case for new command - use `List.find` to grab a Todo with given id
+1. (Shared) in `apply` function add case for new event - use `List.filter` to remove Todo that has the given Id
+1. (Client) add `Destroy` Msg with Id of a Todo (`Guid`)
+1. (Client) in `update` function handle new Msg - execute `DeleteCommand`
+1. (Client) add `OnClick` event handler to the button and `dispatch` a `Destroy` msg with todo's Id
+1. (Client) in `request` function handle `DeleteCommand` - call DELETE /todo/{id} without body
+1. (Server) add handler for DELETE to `todoRouter` - execute `DeleteCommand`
+1. (Shared) add `TodoNotFound` error and in `handle` function replace `List.find` with `List.tryFind` to properly handle missing todo error
+1. (Server) in `execute` function for `TodoNotFound` return HTTP 404 `notFound`
+
+## 2. toggle completed for a Todo
+
+## 3. delete completed Todos
+
+## 4. toggle completed for all Todos
+
+## 5. (*) edit title of a Todo
