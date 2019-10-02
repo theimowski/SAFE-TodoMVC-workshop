@@ -1,0 +1,51 @@
+###
+### 0. Get the app up & running
+### get all Todos
+GET http://localhost:8080/api/todos
+
+### get a Todo by its Id
+GET http://localhost:8080/api/todo/1e4b6bc5-8eb7-46eb-a681-518c99dbcbd4
+
+### add new Todo
+POST http://localhost:8080/api/todos
+content-type: application/json
+
+{
+    "Id": "1e4b6bc5-8eb7-46eb-a681-518c99dbcbd4",
+    "Title": "a todo added from REST client",
+}
+
+###
+### 1. delete a Todo
+DELETE http://localhost:8080/api/todo/1e4b6bc5-8eb7-46eb-a681-518c99dbcbd4
+
+###
+### 2. toggle completed for a Todo
+PATCH http://localhost:8080/api/todo/1e4b6bc5-8eb7-46eb-a681-518c99dbcbd4
+content-type: application/json
+
+{
+    "Completed": true
+}
+
+###
+### 3. delete completed Todos
+DELETE http://localhost:8080/api/todos
+
+###
+### 4. toggle completed for all Todos
+PATCH http://localhost:8080/api/todos
+content-type: application/json
+
+{
+    "Completed": false
+}
+
+###
+### 5. (*) edit title of a Todo
+PATCH http://localhost:8080/api/todo/1e4b6bc5-8eb7-46eb-a681-518c99dbcbd4
+content-type: application/json
+
+{
+    "Title": "Edited the title"
+}

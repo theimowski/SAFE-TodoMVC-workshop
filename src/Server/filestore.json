@@ -1,0 +1,37 @@
+[
+    {
+        "Id": "8bcd2dcd-d5bd-4107-803d-44a493838b94",
+        "Title": "display all Todos",
+        "Completed": true
+    },
+    {
+        "Id": "f3965991-5ac4-4faf-a72f-3dcb77eeb264",
+        "Title": "add new Todo",
+        "Completed": true
+    },
+    {
+        "Id": "18535233-3d01-4552-af61-7c15b818be66",
+        "Title": "delete a Todo",
+        "Completed": false
+    },
+    {
+        "Id": "ff1f724a-0911-4040-baaf-667b3f67e5df",
+        "Title": "toggle completed for a Todo",
+        "Completed": false
+    },
+    {
+        "Id": "0f4f9b5e-1ada-4c31-84d6-91eb77921804",
+        "Title": "delete completed Todos",
+        "Completed": false
+    },
+    {
+        "Id": "8b6a7a74-7f81-48f1-aafc-38985e022838",
+        "Title": "toggle completed for all Todos",
+        "Completed": false
+    },
+    {
+        "Id": "f6ad5f9c-17d5-49be-8faa-b8e6529a25e9",
+        "Title": "(*) edit title of a Todo",
+        "Completed": false
+    }
+]
