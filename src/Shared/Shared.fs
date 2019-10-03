@@ -35,6 +35,7 @@ type Todo =
 type Event =
     | TodoAdded of Todo
     | TodoDeleted of Todo
+    | TodoPatched of Todo
 
 /// Error is part of our domain.
 /// It can be a result of executing a Command from invalid state.
@@ -67,6 +68,12 @@ module Todos =
                 TodoDeleted todo |> Ok
             | None ->
                 Error TodoNotFound
+        | PatchCommand (id, patchDTO) ->
+            match todos |> List.tryFind (fun t -> t.Id = id) with
+            | Some todo ->
+                { todo with Completed = patchDTO.Completed } |> TodoPatched |> Ok
+            | None ->
+                Error TodoNotFound
 
     /// apply takes current state (Todo list) and an Event
     /// and returns next state (Todo list)
@@ -78,3 +85,5 @@ module Todos =
             todos @ [ todo ]
         | TodoDeleted todo ->
             todos |> List.filter (fun t -> t.Id <> todo.Id)
+        | TodoPatched todo ->
+            todos |> List.map (fun t -> if t.Id = todo.Id then todo else t)
