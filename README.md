@@ -82,19 +82,38 @@ If using Remote Container:
 
 ## 4. toggle completed for all Todos
 
-* (Client) add UI elements - in `viewTodos` function, before `ul` add 2 elements: 1) `input` with `checkbox` type and `toggle-all` class, 2) `label` with `HtmlFor` property set to `toggle-all`
-* (Shared) add `PatchAllCommand` with `PatchDTO` and `AllTodosMarkedAs` event with bool flag, cover the cases in `handle` and `apply`
-* (Client) add `SetAllCompleted` Msg with bool flag, execute `PatchAllCommand` for the Msg, call PATCH /todos with `PatchDTO` body for the command
-* (Client) add `OnClick` handler to the "toggle-all" **label (!)** and `dispatch SetAllCompleted`
-* (Client) make the "toggle-all" checkbox checked when all Todos are completed, and add a dummy `OnChange` handler to checkbox (can use `ignore` function) - this is so that we overcome React warnings on uncontrolled inputs
-* (Server) add handler for PATCH /todos - read `PatchDTO` from request and call `PatchAllCommand`
+1. (Client) add UI elements - in `viewTodos` function, before `ul` add 2 elements: 1) `input` with `checkbox` type and `toggle-all` class, 2) `label` with `HtmlFor` property set to `toggle-all`
+1. (Shared) add `PatchAllCommand` with `PatchDTO` and `AllTodosMarkedAs` event with bool flag, cover the cases in `handle` and `apply`
+1. (Client) add `SetAllCompleted` Msg with bool flag, execute `PatchAllCommand` for the Msg, call PATCH /todos with `PatchDTO` body for the command
+1. (Client) add `OnClick` handler to the "toggle-all" **label (!)** and `dispatch SetAllCompleted`
+1. (Client) make the "toggle-all" checkbox checked when all Todos are completed, and add a dummy `OnChange` handler to checkbox (can use `ignore` function) - this is so that we overcome React warnings on uncontrolled inputs
+1. (Server) add handler for PATCH /todos - read `PatchDTO` from request and call `PatchAllCommand`
 
 ## 5. (*) edit title of a Todo
 
-This one is a bit harder and requires bit more work on the Client side.
-Steps described here will not be as precise as before, so treat it as a kind of challenge!
+The specifications for this task are as follows ([reference](https://github.com/tastejs/todomvc/blob/master/app-spec.md#editing)):
 
-*
+* After double clicking on a label, the Todo should go into editing mode
+* Editing mode means that instead of the label, a text input is displayed
+* You can edit the Todo's title by changing value of the input and using Enter key
+* When editing the title and clicking Esc, changes should be aborted
+* It should call PATCH /todo/{id} (see `todos.http` file)
+
+This one is a bit harder and requires bit more work on the Client side.
+Steps described here will not be as precise as before, and they are not necessarily in the order, rather just general tips, so treat this task as a kind of challenge!
+
+* (Client) You'll need to model the editing mode - one way for doing that is adding `Editing` field to our `Model` and keeping track of the Id and temporary editing value
+* (Client) More than one Msg is needed to implement this feature - you might create Msgs for following:
+  * start editing mode,
+  * abort editing mode,
+  * set editing value,
+  * save changes.
+* (Client) in `viewTodo`:
+  * `editing` class should be present on `li` when a Todo is in editing mode
+  * the double-click handler should be attached to `label`
+  * the edit `input` should be child of `li` element
+  * the input should have `edit` class, `valueOrDefault` set to the temporary value, and subscribe to `OnChange` and `OnKeyDown` events
+* (Shared) to reuse the `PatchCommand` for both toggling Completed and editing Title, you might make the `PatchDTO` have two `option` fields for Completed and Title - the serialization will simply set the value to `None` if it's missing in JSON. This means that it's probably a good idea to extract a separate type for `PatchAllCommand` - e.g. `PatchAllDTO` with single "Completed" field
 
 ## 6. (**) extras
 
@@ -102,5 +121,6 @@ Following are left as an optional exercises, they are possible improvements on w
 They might be bit harder to do as I haven't prepared sample code for those (yet).
 
 * add validation that Todo's title should never be empty
+* when editing a Todo, respect also `Blur` event to save changes
 * implement Routing as per [TodoMVC specs](https://github.com/tastejs/todomvc/blob/master/app-spec.md#routing) - use [Fable.Elmish.Browser](https://elmish.github.io/browser/index.html) package
 * make the edit input focused when entering editing mode - one way of doing that is using [React Refs](https://pl.reactjs.org/docs/refs-and-the-dom.html) - you'll need an advanced usage of `Fable.React` as described e.g. [here](https://fable.io/blog/Announcing-Fable-React-5.html)
