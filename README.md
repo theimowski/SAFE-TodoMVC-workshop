@@ -82,7 +82,19 @@ If using Remote Container:
 
 ## 4. toggle completed for all Todos
 
+* (Client) add UI elements - in `viewTodos` function, before `ul` add 2 elements: 1) `input` with `checkbox` type and `toggle-all` class, 2) `label` with `HtmlFor` property set to `toggle-all`
+* (Shared) add `PatchAllCommand` with `PatchDTO` and `AllTodosMarkedAs` event with bool flag, cover the cases in `handle` and `apply`
+* (Client) add `SetAllCompleted` Msg with bool flag, execute `PatchAllCommand` for the Msg, call PATCH /todos with `PatchDTO` body for the command
+* (Client) add `OnClick` handler to the "toggle-all" **label (!)** and `dispatch SetAllCompleted`
+* (Client) make the "toggle-all" checkbox checked when all Todos are completed, and add a dummy `OnChange` handler to checkbox (can use `ignore` function) - this is so that we overcome React warnings on uncontrolled inputs
+* (Server) add handler for PATCH /todos - read `PatchDTO` from request and call `PatchAllCommand`
+
 ## 5. (*) edit title of a Todo
+
+This one is a bit harder and requires bit more work on the Client side.
+Steps described here will not be as precise as before, so treat it as a kind of challenge!
+
+*
 
 ## 6. (**) extras
 
