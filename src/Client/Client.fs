@@ -170,7 +170,9 @@ let viewTodo (todo: Todo) dispatch =
         [ ClassName "view" ]
         [ input
             [ Type "checkbox"
-              ClassName "toggle" ]
+              ClassName "toggle"
+              Checked todo.Completed
+              OnChange (fun _ -> SetCompleted(todo.Id, not todo.Completed) |> dispatch) ]
           label
             [ ]
             [ str todo.Title ]
