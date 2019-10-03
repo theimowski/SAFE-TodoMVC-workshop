@@ -69,6 +69,7 @@ let request (command: Command) =
     match command with
     | AddCommand addDTO -> fetch HttpMethod.POST todos (Some addDTO)
     | DeleteCommand id -> fetch HttpMethod.DELETE (todo id) None
+    | PatchCommand (id, patchDTO) -> fetch HttpMethod.PATCH (todo id) (Some patchDTO)
 
 // Initial Model and Elmish Cmd
 
