@@ -25,6 +25,8 @@ let execute (command: Command) next ctx =
             return! json todos' next ctx
         | Error TodoIdAlreadyExists ->
             return! Response.conflict ctx "Todo with same Id already exists!"
+        | Error TodoNotFound ->
+            return! Response.notFound ctx "Todo not found!"
     }
 
 /// handles HTTP requests with a given method to /todos endpoint
