@@ -52,6 +52,10 @@ let todoRouter (id: Guid) = router {
             | None ->
                 return! Response.notFound ctx "Todo not found!"
         })
+    delete "" (fun next ctx ->
+        task {
+            return! execute (DeleteCommand id) next ctx
+        })
 }
 
 /// forward endpoints to proper routers
