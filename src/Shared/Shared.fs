@@ -16,6 +16,7 @@ type AddDTO =
 /// we'll follow a suffix convention, e.g. `AddCommand`
 type Command =
     | AddCommand of AddDTO
+    | DeleteCommand of Guid
 
 /// Todo is the main type in our domain.
 /// We'll use `Todo list` type to keep track of all Todos.
@@ -29,6 +30,7 @@ type Todo =
 /// We use past tense for naming those, e.g. `TodoAdded`.
 type Event =
     | TodoAdded of Todo
+    | TodoDeleted of Todo
 
 /// Error is part of our domain.
 /// It can be a result of executing a Command from invalid state.
