@@ -162,7 +162,10 @@ let viewTodo (todo: Todo) dispatch =
         [ "completed", todo.Completed ] ]
     [ div
         [ ClassName "view" ]
-        [ label
+        [ input
+            [ Type "checkbox"
+              ClassName "toggle" ]
+          label
             [ ]
             [ str todo.Title ]
           button
