@@ -73,6 +73,13 @@ If using Remote Container:
 
 ## 3. delete completed Todos
 
+1. (Client) in `viewControls`, just after `span` with "X items left" add a `button` with `clear-completed` class and "Clear completed" inner text child node (use `str "text"` function)
+1. (Client) hide the `button` when none of Todos is Completed - use `Hidden` property and `todosCompleted` counter
+1. (Shared) add `DeleteCompletedCommand` and `CompletedTodosDeleted` event, cover cases in `handle` and `apply`
+1. (Client) add `ClearCompleted` Msg, execute `DeleteCompletedCommand` in `update` for the Msg, call DELETE /todos for the command in `request`
+1. (Client) add `OnClick` handler to the "Clear completed" `button`, `dispatch ClearCompleted`
+1. (Server) add handler for DELETE to `todosRouter` - execute `DeleteCompletedCommand`
+
 ## 4. toggle completed for all Todos
 
 ## 5. (*) edit title of a Todo
