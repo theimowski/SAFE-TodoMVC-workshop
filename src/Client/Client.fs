@@ -39,6 +39,7 @@ type Msg =
     // We're mostly interested in those
     | UpdateInput of string
     | Add
+    | Destroy of Guid
 
 // Fetch
 
