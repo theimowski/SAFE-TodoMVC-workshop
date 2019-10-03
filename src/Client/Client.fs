@@ -130,6 +130,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
               Title = model.Input }
         let cmd = execute (AddCommand addDTO)
         { model with Input = "" }, cmd
+    | Destroy id ->
+        let cmd = execute (DeleteCommand id)
+        model, cmd
 
 // View
 
