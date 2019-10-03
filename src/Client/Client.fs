@@ -130,16 +130,6 @@ let viewTodos model dispatch =
           [ ClassName "todo-list" ]
           [ for todo in todos ->
                 viewTodo todo dispatch ] ]
-
-let viewControlsCount todosLeft =
-    let item =
-        if todosLeft = 1 then " item" else " items"
-
-    span
-        [ ClassName "todo-count" ]
-        [ strong [] [ str (string todosLeft) ]
-          str (item + " left") ]
-
 let viewControls model dispatch =
     let todosCompleted =
         model.Todos
@@ -148,10 +138,15 @@ let viewControls model dispatch =
 
     let todosLeft = model.Todos.Length - todosCompleted
 
+    let item = if todosLeft = 1 then " item" else " items"
+
     footer
         [ ClassName "footer"
           Hidden (List.isEmpty model.Todos) ]
-        [ viewControlsCount todosLeft ]
+        [ span
+              [ ClassName "todo-count" ]
+              [ strong [] [ str (string todosLeft) ]
+                str (item + " left") ] ]
 
 let view model dispatch =
     div
