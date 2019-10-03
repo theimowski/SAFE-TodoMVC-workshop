@@ -58,6 +58,8 @@ If using Remote Container:
 * There's a `todos.http` file in repository which shows what HTTP calls our server should accept. After every feature make sure to check you can work with the application both via Web UI and the HTTP API!
 * We'll skip the Azure integration part due to lack of time
 * We'll be using a file-based database, just for demo purposes - the file is called `filestore.json` and you can browse it to see all Todos.
+* For simplicity, all server HTTP calls will return whole list of new Todos.
+* We kinda follow the DDD approach - using Commands and Events for our Todo domain.
 
 ## 0. display Todos + add new Todo
 
@@ -113,14 +115,33 @@ If we call DELETE /todo/{id} multiple times (from REST Client), we'll get a 500 
 
 ## 2. toggle completed for a Todo
 
-1. (Client) in `viewTodo`, just before `label` add an `input` with `checkbox` type and `toggle` class - note `input` tag can't have children so use only list for properties!
-1. (Client) use `Checked` property to mark the input when corresponding Todo is completed
-1. (Shared) add `PatchDTO` type with `Completed` field and add `PatchCommand` with `Guid` and `PatchDTO`
-1. (Shared) add `TodoPatched` event, implement case for `PatchCommand` in `handle` (remember to check if todo exists), cover `TodoPatched` in `apply` - use `List.map` and check if Id matches
-1. (Client) add `SetCompleted` Msg with Id and flag (`bool`), in `update` function handle this case and `execute` the `PathCommand`
-1. (Client) add `OnChange` handler for the checkbox `input` and `dispatch` `SetCompleted` Msg
-1. (Client) handle `PatchCommand` in `request` function - call PATCH /todo/{id} with `PatchDTO` as body
-1. (Server) add handler for PATCH to `todoRouter` - read `PatchDTO` from the request (`ctx.BindModelAsync`) and execute `PatchCommand`
+* (Client) in `viewTodo`, just before `label` add an `input` with `checkbox` type and `toggle` class
+
+Use `Type` and `ClassName` React props. Note `input` tag can't have children so use only first list for properties and skip second list! Observe how a rounded checkbox is added in front of the label for each Todo.
+
+* (Shared) add `PatchDTO` type with `Completed` field and add `PatchCommand` with a tuple of `Guid` and `PatchDTO`
+
+For `PatchDTO` use Record type - same as was used for `AddDTO`. Record is the "product type" in F# and can have multiple named fields. `PatchDTO` should have a single `Completed` field of `bool` type. `PatchCommand` should take a tuple as a backing field : `Guid * PatchDTO` - the asterisk stands for defining a tuple in type signature.
+
+* (Shared) add `TodoPatched` event and cover new cases for `handle` and `apply`
+
+The `TodoPatched` event can have whole `Todo` as a backing field - it will make it simpler for `apply` function. For `handle` and `PatchCommand` remember to check if todo exists (like for `DeleteCommand`). When pattern matching, you can deconstruct a tuple like this: `| PatchCommand (id, patchDTO) ->`. To return a copy of a Todo with single field changed use following syntax: `{ todo with Completed = ... }`. For `TodoPatched` in `apply` - use `List.map`, check if Id matches and return either current or patched value of a Todo - you can use `if ... then ... else ...`.
+
+* (Client) add `SetCompleted` Msg with Id and flag (`bool`); in `update` function handle this case and `execute` the `PathCommand`
+
+Again use a tuple for backing field of `SetCompleted` (`Guid * bool`). In `update` follow pattern from `Add` Msg - create an instance of `PatchDTO`, pass it to `PatchCommand` and execute.
+
+* (Client) use `Checked` property to mark the "toggle" checkbox when corresponding Todo is completed; add also `OnChange` handler and `dispatch` `SetCompleted` Msg
+
+`Checked` React prop takes a flag as argument - use `todo.Completed` to determine if it should be checked or not. To construct instance of `SetCompleted` you need to pass a tuple of Todo's Id an **negated** value of it's current Completed status - use `not` function (`bool -> bool`).
+
+* (Client) handle `PatchCommand` in `request` function
+
+Call PATCH /todo/{id} with `PatchDTO` as body (`Some patchDTO`)
+
+* (Server) add handler for PATCH to `todoRouter`
+
+Read `PatchDTO` from the request - use `ctx.BindModelAsync<PatchDTO>()`. Construct value of `PatchCommand` and execute it, using same function as for `delete`.
 
 ## 3. delete completed Todos
 
