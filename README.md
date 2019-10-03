@@ -4,7 +4,7 @@
 
 ### Source code
 
-Clone or download this repository: 
+Clone or download this repository:
 
 [https://github.com/theimowski/SAFE-TodoMVC-workshop](https://github.com/theimowski/SAFE-TodoMVC-workshop
 )
@@ -83,3 +83,12 @@ If using Remote Container:
 ## 4. toggle completed for all Todos
 
 ## 5. (*) edit title of a Todo
+
+## 6. (**) extras
+
+Following are left as an optional exercises, they are possible improvements on what we already have, and are part of the original TodoMVC project specifications.
+They might be bit harder to do as I haven't prepared sample code for those (yet).
+
+* add validation that Todo's title should never be empty
+* implement Routing as per [TodoMVC specs](https://github.com/tastejs/todomvc/blob/master/app-spec.md#routing) - use [Fable.Elmish.Browser](https://elmish.github.io/browser/index.html) package
+* make the edit input focused when entering editing mode - one way of doing that is using [React Refs](https://pl.reactjs.org/docs/refs-and-the-dom.html) - you'll need an advanced usage of `Fable.React` as described e.g. [here](https://fable.io/blog/Announcing-Fable-React-5.html)
