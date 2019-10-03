@@ -165,7 +165,8 @@ let viewTodo (todo: Todo) dispatch =
             [ ]
             [ str todo.Title ]
           button
-            [ ClassName "destroy" ]
+            [ ClassName "destroy"
+              OnClick (fun _ -> dispatch (Destroy todo.Id)) ]
             [ ] ] ]
 
 /// displays whole list of Todos
