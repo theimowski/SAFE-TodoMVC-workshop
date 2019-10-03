@@ -62,6 +62,15 @@ If using Remote Container:
 
 ## 2. toggle completed for a Todo
 
+1. (Client) in `viewTodo`, just before `label` add an `input` with `checkbox` type and `toggle` class - note `input` tag can't have children so use only list for properties!
+1. (Client) use `Checked` property to mark the input when corresponding Todo is completed
+1. (Shared) add `PatchDTO` type with `Completed` field and add `PatchCommand` with `Guid` and `PatchDTO`
+1. (Shared) add `TodoPatched` event, implement case for `PatchCommand` in `handle` (remember to check if todo exists), cover `TodoPatched` in `apply` - use `List.map` and check if Id matches
+1. (Client) add `SetCompleted` Msg with Id and flag (`bool`), in `update` function handle this case and `execute` the `PathCommand`
+1. (Client) add `OnChange` handler for the checkbox `input` and `dispatch` `SetCompleted` Msg
+1. (Client) handle `PatchCommand` in `request` function - call PATCH /todo/{id} with `PatchDTO` as body
+1. (Server) add handler for PATCH to `todoRouter` - read `PatchDTO` from the request (`ctx.BindModelAsync`) and execute `PatchCommand`
+
 ## 3. delete completed Todos
 
 ## 4. toggle completed for all Todos
