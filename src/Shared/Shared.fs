@@ -37,6 +37,7 @@ type Event =
 /// E.g. `TodoIdAlreadyExists` when trying to add a Todo with duplicate Id.
 type Error =
     | TodoIdAlreadyExists
+    | TodoNotFound
 
 /// Todos module is there for our domain logic
 module Todos =
@@ -57,8 +58,11 @@ module Todos =
                       Completed = false }
                 TodoAdded todo |> Ok
         | DeleteCommand id ->
-            let todo = todos |> List.find (fun t -> t.Id = id)
-            TodoDeleted todo |> Ok
+            match todos |> List.tryFind (fun t -> t.Id = id) with
+            | Some todo ->
+                TodoDeleted todo |> Ok
+            | None ->
+                Error TodoNotFound
 
     /// apply takes current state (Todo list) and an Event
     /// and returns next state (Todo list)
