@@ -56,6 +56,9 @@ module Todos =
                       Title = addDTO.Title
                       Completed = false }
                 TodoAdded todo |> Ok
+        | DeleteCommand id ->
+            let todo = todos |> List.find (fun t -> t.Id = id)
+            TodoDeleted todo |> Ok
 
     /// apply takes current state (Todo list) and an Event
     /// and returns next state (Todo list)
