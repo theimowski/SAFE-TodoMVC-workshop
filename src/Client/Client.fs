@@ -40,6 +40,7 @@ type Msg =
     | UpdateInput of string
     | Add
     | Destroy of Guid
+    | SetCompleted of Guid * bool
 
 // Fetch
 
@@ -133,6 +134,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         { model with Input = "" }, cmd
     | Destroy id ->
         let cmd = execute (DeleteCommand id)
+        model, cmd
+    | SetCompleted (id, completed) ->
+        let patchDTO : PatchDTO =
+            { Completed = completed }
+        let cmd = PatchCommand (id, patchDTO) |> execute
         model, cmd
 
 // View
