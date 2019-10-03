@@ -159,7 +159,10 @@ let viewTodo (todo: Todo) dispatch =
         [ ClassName "view" ]
         [ label
             [ ]
-            [ str todo.Title ] ] ]
+            [ str todo.Title ]
+          button
+            [ ClassName "destroy" ]
+            [ ] ] ]
 
 /// displays whole list of Todos
 let viewTodos model dispatch =
