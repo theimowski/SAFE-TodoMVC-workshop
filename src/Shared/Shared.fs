@@ -9,6 +9,9 @@ type AddDTO =
     { Id : Guid
       Title : string }
 
+type PatchDTO =
+    { Completed : bool }
+
 /// Command is a part of our domain
 /// It can be executed by performing certain action.
 /// Executing the Command results in producing an Event or an Error.
@@ -17,6 +20,7 @@ type AddDTO =
 type Command =
     | AddCommand of AddDTO
     | DeleteCommand of Guid
+    | PatchCommand of Guid * PatchDTO
 
 /// Todo is the main type in our domain.
 /// We'll use `Todo list` type to keep track of all Todos.
