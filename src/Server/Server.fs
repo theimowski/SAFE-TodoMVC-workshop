@@ -58,6 +58,11 @@ let todoRouter (id: Guid) = router {
         task {
             return! execute (DeleteCommand id) next ctx
         })
+    patch "" (fun next ctx ->
+        task {
+            let! patchDTO = ctx.BindModelAsync<PatchDTO>()
+            return! execute (PatchCommand (id, patchDTO)) next ctx
+        })
 }
 
 /// forward endpoints to proper routers
