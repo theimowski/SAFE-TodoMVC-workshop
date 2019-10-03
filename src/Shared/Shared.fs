@@ -68,3 +68,5 @@ module Todos =
         match event with
         | TodoAdded todo ->
             todos @ [ todo ]
+        | TodoDeleted todo ->
+            todos |> List.filter (fun t -> t.Id <> todo.Id)
