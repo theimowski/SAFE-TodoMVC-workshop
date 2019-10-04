@@ -208,7 +208,9 @@ let viewTodos model dispatch =
         Style [ Visibility cssVisibility ]]
       [ input
             [ Type "checkbox"
-              ClassName "toggle-all" ]
+              ClassName "toggle-all"
+              Checked allCompleted
+              OnChange ignore ]
         label
             [ OnClick (fun _ -> SetAllCompleted (not allCompleted) |> dispatch) ]
             [ ]
