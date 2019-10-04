@@ -42,6 +42,7 @@ type Msg =
     | Destroy of Guid
     | SetCompleted of Guid * bool
     | ClearCompleted
+    | SetAllCompleted of bool
 
 // Fetch
 
@@ -72,6 +73,7 @@ let request (command: Command) =
     | DeleteCommand id -> fetch HttpMethod.DELETE (todo id) None
     | PatchCommand (id, patchDTO) -> fetch HttpMethod.PATCH (todo id) (Some patchDTO)
     | DeleteCompletedCommand -> fetch HttpMethod.DELETE todos None
+    | PatchAllCommand patchDTO -> fetch HttpMethod.PATCH todos (Some patchDTO)
 
 // Initial Model and Elmish Cmd
 
@@ -146,6 +148,12 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | ClearCompleted ->
         let cmd = execute DeleteCompletedCommand
         model, cmd
+    | SetAllCompleted completed ->
+        let patchDTO : PatchDTO =
+            { Completed = completed }
+        let cmd = PatchAllCommand patchDTO |> execute
+        model, cmd
+
 
 // View
 
