@@ -213,7 +213,10 @@ let viewControls model dispatch =
         [ span
               [ ClassName "todo-count" ]
               [ strong [] [ str (string todosLeft) ]
-                str (item + " left") ] ]
+                str (item + " left") ]
+          button
+            [ ClassName "clear-completed" ]
+            [ str "Clear completed" ] ]
 
 /// combines all parts into whole
 let view model dispatch =
