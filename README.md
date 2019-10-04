@@ -25,7 +25,7 @@ Alternatively, you can use Docker and an extension for Visual Studio Code - [Rem
 
 ### VS Code Extensions
 
-Following should be already preinstalled if you opted for the Remote Container option. Otherwise please install them - they'll prove useful for the workshop.
+Following should be already preinstalled if you opted for the Remote Container option. Otherwise please install them - they'll prove useful during the workshop.
 
 #### Ionide-fsharp
 
@@ -35,17 +35,17 @@ Required when working with local prerequisites. Provides language support for F#
 
 There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. The "REST Client" extension for VS Code integrates with this file. Alternatively you can use any other HTTP client of your preference (Postman etc.)
 
-#### Rainbow Brackets extensions
+#### Rainbow Brackets
 
-This is another VS Code extension that helps when working with Fable and React - it will colour corresponding opening and close brackets, making it easier to keep track of brackets depth.
+This is another VS Code extension that helps when working with Fable and React - it will colour corresponding opening and closing brackets, making it easier to keep track of bracket nesting level.
 
 
 ## Get the app running
 
 If you choose to install prerequisites locally:
 
-1. Open terminal of your choice
-1. Change working directory to repository root
+1. Open repository directory in VS Code
+1. Open VS Code terminal
 1. Invoke `fake build --target run`
 1. After a short delay, http://localhost:8080/ should open in your browser automatically
 
@@ -57,22 +57,36 @@ If using Remote Container:
 1. Click "Reopen in container" in a pop-up window
 1. Open VS Code terminal, it should attach to the container
 1. Invoke `fake build --target run`
-1. Open http://localhost:8080/
+1. Open http://localhost:8080/ in your browser
+
+I also recommend opening developer tools in browser and placing your editor side by side with the browser - the watch mode makes it really nice to work without unnecessary window switching:
+
+![side by side](img/side_by_side.png)
+
+## SAFE Stack
+
+* **S**aturn for back-end services in F#
+* **A**zure as a hosting platform plus associated platform services
+* **F**able for running F# in the web browser
+* **E**lmish for client-side user interfaces
+
+
+https://safe-stack.github.io/docs/
 
 ## Important notes
 
+* Implementation of the workshop is on `solution` branch - follow commits on that branch to see my solution for every feature and every single task. This might be helpful when in doubt or stuck.
+* We'll skip the Azure integration part - not enough time and would require everyone to have their Azure accounts properly set up. Beware Azure is obviously not the only option of hosting SAFE applications.
+* We'll be using a file-based database, just for demo purposes - the file is called `filestore.json`, it's indexed in Git - you can browse it to see all Todos.
+* There's a `todos.http` file in repository which shows what HTTP calls our server should accept. After every feature make sure to check you can work with the application both via Web UI and the HTTP API!
+* For simplicity, all server HTTP calls will return whole list of new Todos.
+* We kinda follow the DDD approach - using Commands and Events for our Todo domain.
 * We're interested in 5 files:
     * Shared.fs
     * Client.fs
     * Server.fs
     * todos.http
     * filestore.json
-* Implementation of the workshop is on `solution` branch - each commit represents corresponding task to get a feature done
-* There's a `todos.http` file in repository which shows what HTTP calls our server should accept. After every feature make sure to check you can work with the application both via Web UI and the HTTP API!
-* We'll skip the Azure integration part due to lack of time
-* We'll be using a file-based database, just for demo purposes - the file is called `filestore.json` and you can browse it to see all Todos.
-* For simplicity, all server HTTP calls will return whole list of new Todos.
-* We kinda follow the DDD approach - using Commands and Events for our Todo domain.
 
 ## 0. display Todos + add new Todo
 
@@ -243,3 +257,4 @@ They might be bit harder to do as I haven't prepared sample code for those (yet)
 * when editing a Todo, respect also `Blur` event to save changes
 * implement Routing as per [TodoMVC specs](https://github.com/tastejs/todomvc/blob/master/app-spec.md#routing) - use [Fable.Elmish.Browser](https://elmish.github.io/browser/index.html) package
 * make the edit input focused when entering editing mode - one way of doing that is using [React Refs](https://pl.reactjs.org/docs/refs-and-the-dom.html) - you'll need an advanced usage of `Fable.React` as described e.g. [here](https://fable.io/blog/Announcing-Fable-React-5.html)
+* deploy to Azure App Engine - the project has been created with arm.template, so if you have an Azure account follow [these](https://safe-stack.github.io/docs/template-appservice/) steps to deploy the TodoMVC app to cloud!
