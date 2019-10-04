@@ -6,6 +6,8 @@
 		"ionide.ionide-fsharp",
         "ms-vscode.csharp",
         "editorconfig.editorconfig",
-        "msjsdiag.debugger-for-chrome"
+        "msjsdiag.debugger-for-chrome",
+        "2gua.rainbow-brackets",
+        "humao.rest-client"
 	]
 }

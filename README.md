@@ -13,14 +13,6 @@ Clone or download this repository:
 
 For this workshop it's recommended to use [Visual Studio Code](https://code.visualstudio.com/download). You **should** be fine using different F# IDE (Visual Studio or Jetbrains Rider) but I **might** not be able to help in case of any problems with these.
 
-#### Rest client
-
-There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. There's a nice "REST Client" extension for VS Code which integrates with this file. Alternatively you can use any other HTTP client of your preference (Postman etc.)
-
-#### Rainbow Brackets extensions
-
-This is another VS Code extension that helps when working with Fable and React - it will colour corresponding opening and close brackets, making it easier to keep track of brackets depth.
-
 Then you have two options of installing prerequisites: **Installing locally** or using **Remote Container**.
 
 ### Installing locally
@@ -30,6 +22,23 @@ This is the standard way - installing all dependencies on your development box. 
 ### Remote Container
 
 Alternatively, you can use Docker and an extension for Visual Studio Code - [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers). This allows your local VS Code to communicate with a remote Docker container that will have all other dependencies installed for you.
+
+### VS Code Extensions
+
+Following should be already preinstalled if you opted for the Remote Container option. Otherwise please install them - they'll prove useful for the workshop.
+
+#### Ionide-fsharp
+
+Required when working with local prerequisites. Provides language support for F#.
+
+#### Rest client
+
+There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. The "REST Client" extension for VS Code integrates with this file. Alternatively you can use any other HTTP client of your preference (Postman etc.)
+
+#### Rainbow Brackets extensions
+
+This is another VS Code extension that helps when working with Fable and React - it will colour corresponding opening and close brackets, making it easier to keep track of brackets depth.
+
 
 ## Get the app running
 
