@@ -22,7 +22,8 @@ open Shared
 /// the value of text input field (for adding new Todo).
 type Model =
     { Todos : Todo list
-      Input : string }
+      Input : string
+      Editing : (Guid * string) option }
 
 // Messages
 
@@ -43,6 +44,10 @@ type Msg =
     | SetCompleted of Guid * bool
     | ClearCompleted
     | SetAllCompleted of bool
+    | StartEditing of Guid
+    | AbortEditing
+    | SetEditingValue of string
+    | ApplyEditing
 
 // Fetch
 
@@ -91,7 +96,8 @@ let init () : Model * Cmd<Msg> =
     let cmd = Cmd.OfPromise.perform fetchTodos () TodosFetched
     let model =
         { Todos = []
-          Input = "" }
+          Input = ""
+          Editing = None }
     model, cmd
 
 // Update
@@ -141,18 +147,42 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         let cmd = execute (DeleteCommand id)
         model, cmd
     | SetCompleted (id, completed) ->
-        let patchDTO : PatchDTO =
-            { Completed = completed }
+        let patchDTO : PatchSingleDTO =
+            { Completed = Some completed
+              Title = None }
         let cmd = PatchCommand (id, patchDTO) |> execute
         model, cmd
     | ClearCompleted ->
         let cmd = execute DeleteCompletedCommand
         model, cmd
     | SetAllCompleted completed ->
-        let patchDTO : PatchDTO =
+        let patchDTO : PatchAllDTO =
             { Completed = completed }
         let cmd = PatchAllCommand patchDTO |> execute
         model, cmd
+    | StartEditing id ->
+        let editing =
+            model.Todos
+            |> List.tryFind (fun t -> t.Id = id)
+            |> Option.map (fun t -> t.Id, t.Title)
+        { model with Editing = editing }, Cmd.none
+    | AbortEditing ->
+        { model with Editing = None }, Cmd.none
+    | SetEditingValue value ->
+        let editing =
+            model.Editing
+            |> Option.map (fun (id, _) -> id, value)
+        { model with Editing = editing }, Cmd.none
+    | ApplyEditing ->
+        match model.Editing with
+        | Some (id, value) ->
+            let patchDTO : PatchSingleDTO =
+                { Completed = None
+                  Title = Some value }
+            let cmd = execute (PatchCommand (id, patchDTO))
+            { model with Editing = None }, cmd
+        | None ->
+            model, Cmd.none
 
 
 // View
@@ -176,10 +206,11 @@ let viewInput (model: Model) dispatch =
                 AutoFocus true ] ]
 
 /// displays a single Todo
-let viewTodo (todo: Todo) dispatch =
+let viewTodo (todo: Todo, editing: string option) dispatch =
   li
     [ classList
-        [ "completed", todo.Completed ] ]
+        [ "completed", todo.Completed
+          "editing", Option.isSome editing ] ]
     [ div
         [ ClassName "view" ]
         [ input
@@ -188,12 +219,20 @@ let viewTodo (todo: Todo) dispatch =
               Checked todo.Completed
               OnChange (fun _ -> SetCompleted(todo.Id, not todo.Completed) |> dispatch) ]
           label
-            [ ]
+            [ OnDoubleClick (fun _ -> StartEditing todo.Id |> dispatch) ]
             [ str todo.Title ]
           button
             [ ClassName "destroy"
               OnClick (fun _ -> dispatch (Destroy todo.Id)) ]
-            [ ] ] ]
+            [ ] ]
+      input
+        [ ClassName "edit"
+          valueOrDefault (defaultArg editing "")
+          OnChange (fun e -> e.target?value |> SetEditingValue |> dispatch)
+          OnKeyDown
+            (fun e ->
+                if e.keyCode = Key.enter then dispatch ApplyEditing
+                elif e.keyCode = Key.esc then dispatch AbortEditing) ] ]
 
 /// displays whole list of Todos
 let viewTodos model dispatch =
@@ -217,7 +256,10 @@ let viewTodos model dispatch =
         ul
           [ ClassName "todo-list" ]
           [ for todo in todos ->
-                viewTodo todo dispatch ] ]
+                let editing =
+                    model.Editing
+                    |> Option.bind (fun (id, value) -> if todo.Id = id then Some value else None)
+                viewTodo (todo, editing) dispatch ] ]
 
 /// displays a footer under list of Todos
 let viewControls model dispatch =

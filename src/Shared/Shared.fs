@@ -9,7 +9,11 @@ type AddDTO =
     { Id : Guid
       Title : string }
 
-type PatchDTO =
+type PatchSingleDTO =
+    { Completed : bool option
+      Title : string option }
+
+type PatchAllDTO =
     { Completed : bool }
 
 /// Command is a part of our domain
@@ -20,9 +24,9 @@ type PatchDTO =
 type Command =
     | AddCommand of AddDTO
     | DeleteCommand of Guid
-    | PatchCommand of Guid * PatchDTO
+    | PatchCommand of Guid * PatchSingleDTO
     | DeleteCompletedCommand
-    | PatchAllCommand of PatchDTO
+    | PatchAllCommand of PatchAllDTO
 
 /// Todo is the main type in our domain.
 /// We'll use `Todo list` type to keep track of all Todos.
@@ -75,7 +79,10 @@ module Todos =
         | PatchCommand (id, patchDTO) ->
             match todos |> List.tryFind (fun t -> t.Id = id) with
             | Some todo ->
-                { todo with Completed = patchDTO.Completed } |> TodoPatched |> Ok
+                { todo with
+                    Completed = defaultArg patchDTO.Completed todo.Completed
+                    Title = defaultArg patchDTO.Title todo.Title }
+                |> TodoPatched |> Ok
             | None ->
                 Error TodoNotFound
         | DeleteCompletedCommand ->

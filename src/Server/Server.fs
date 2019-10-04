@@ -47,7 +47,7 @@ let todosRouter = router {
         })
     patch "" (fun next ctx ->
         task {
-            let! patchDTO = ctx.BindModelAsync<PatchDTO>()
+            let! patchDTO = ctx.BindModelAsync<PatchAllDTO>()
             return! execute (PatchAllCommand patchDTO) next ctx
         })
 }
@@ -69,7 +69,7 @@ let todoRouter (id: Guid) = router {
         })
     patch "" (fun next ctx ->
         task {
-            let! patchDTO = ctx.BindModelAsync<PatchDTO>()
+            let! patchDTO = ctx.BindModelAsync<PatchSingleDTO>()
             return! execute (PatchCommand (id, patchDTO)) next ctx
         })
 }
