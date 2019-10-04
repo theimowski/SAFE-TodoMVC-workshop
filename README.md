@@ -17,6 +17,10 @@ For this workshop it's recommended to use [Visual Studio Code](https://code.visu
 
 There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. There's a nice "REST Client" extension for VS Code which integrates with this file. Alternatively you can use any other HTTP client of your preference (Postman etc.)
 
+#### Rainbow Brackets extensions
+
+This is another VS Code extension that helps when working with Fable and React - it will colour corresponding opening and close brackets, making it easier to keep track of brackets depth.
+
 Then you have two options of installing prerequisites: **Installing locally** or using **Remote Container**.
 
 ### Installing locally
@@ -69,7 +73,7 @@ These features are already implemented on master branch.
 
 * (Client) in `viewTodo`, just after the `label` add a `button` with `destroy` class.
 
-F# is whitespace sensitive (like e.g. Python), so make sure you got the indents right - `button` should start in same column as `label`. First list applied to an element stands for its properties (React props) - that's where you should place the `ClassName`, and the second list stands for the element's children (empty in this case). Note how a red cross appears in the UI when you move your mouse over a todo.
+F# is whitespace sensitive (like e.g. Python), so make sure you got the indents right - `button` should start in same column as `label`. When working with React and Elmish, square brackets used for creating lists can get cumbersome - make sure you get them right, otherwise you might experience unwanted compiler errors! First list applied to an element stands for its properties (React props) - that's where you should place the `ClassName`, and the second list stands for the element's children (empty in this case). Note how a red cross appears in the UI when you move your mouse over a todo.
 
 * (Shared) add `DeleteCommand` with Id of a Todo (`Guid` type) and `TodoDeleted` event with a `Todo`
 
@@ -145,12 +149,24 @@ Read `PatchDTO` from the request - use `ctx.BindModelAsync<PatchDTO>()`. Constru
 
 ## 3. delete completed Todos
 
-1. (Client) in `viewControls`, just after `span` with "X items left" add a `button` with `clear-completed` class and "Clear completed" inner text child node (use `str "text"` function)
-1. (Client) hide the `button` when none of Todos is Completed - use `Hidden` property and `todosCompleted` counter
-1. (Shared) add `DeleteCompletedCommand` and `CompletedTodosDeleted` event, cover cases in `handle` and `apply`
-1. (Client) add `ClearCompleted` Msg, execute `DeleteCompletedCommand` in `update` for the Msg, call DELETE /todos for the command in `request`
-1. (Client) add `OnClick` handler to the "Clear completed" `button`, `dispatch ClearCompleted`
-1. (Server) add handler for DELETE to `todosRouter` - execute `DeleteCompletedCommand`
+* (Client) add "Clear completed" button
+
+In `viewControls` function, just after `span` with "X items left" add a `button` with `clear-completed` class and "Clear completed" inner text child node - for that use `str "text"`. `ClassName` React Prop goes into first list, and the child text node - into second.
+
+* (Client) hide the `button` when none of Todos is Completed
+
+Use `Hidden` React prop and `todosCompleted` counter defined above.
+
+* (Shared) `DeleteCompletedCommand` and `CompletedTodosDeleted`
+
+Those cases do not carry any information with themselves, so don't need to add any backing field. Cover new cases in `handle` and `apply`.
+
+* (Client) add `ClearCompleted` Msg
+
+Execute `DeleteCompletedCommand` in `update` for the Msg, call DELETE /todos for the command in `request` without request body
+
+* (Client) add `OnClick` handler to the "Clear completed" `button`, `dispatch ClearCompleted`
+* (Server) add handler for DELETE to `todosRouter` - execute `DeleteCompletedCommand`
 
 ## 4. toggle completed for all Todos
 
