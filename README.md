@@ -165,8 +165,13 @@ Those cases do not carry any information with themselves, so don't need to add a
 
 Execute `DeleteCompletedCommand` in `update` for the Msg, call DELETE /todos for the command in `request` without request body
 
-* (Client) add `OnClick` handler to the "Clear completed" `button`, `dispatch ClearCompleted`
-* (Server) add handler for DELETE to `todosRouter` - execute `DeleteCompletedCommand`
+* (Client) add `OnClick` handler to the "Clear completed" `button`
+
+... and `dispatch ClearCompleted` Msg
+
+* (Server) add handler for DELETE to `todosRouter`
+
+... and execute `DeleteCompletedCommand`
 
 ## 4. toggle completed for all Todos
 
