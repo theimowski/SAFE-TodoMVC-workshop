@@ -260,7 +260,7 @@ Handle `PatchCommand` in `request` function.
 
 Call PATCH /todo/{id} with `PatchDTO` as body (`Some patchDTO`)
 
-### Server - add handler PatchCommand
+### Server - add handler for PatchCommand
 
 The handler should be for PATCH http method to `todoRouter`.
 
@@ -270,51 +270,61 @@ Read `PatchDTO` from the request - use `ctx.BindModelAsync<PatchDTO>()`. Constru
 
 ### Client - add "Clear completed" button
 
-In `viewControls` function, just after `span` with "X items left" add a `button` with `clear-completed` class and "Clear completed" inner text child node - for that use `str "text"`. `ClassName` React Prop goes into first list, and the child text node - into second.
+In `viewControls` function, just after `span` with "X items left" add a `button` with `clear-completed` class and "Clear completed" inner text child node - for that use `str "text"`.
 
-### Client - hide the `button` when none of Todos is Completed
+`ClassName` React Prop goes into first list, and the child text node - into second.
+
+### Client - conditionally hide the button
+
+Hide the "Clear completed" button when none of Todos is Completed
 
 Use `Hidden` React prop and `todosCompleted` counter defined above.
 
-### Shared - `DeleteCompletedCommand` and `CompletedTodosDeleted`
+### Shared - add DeleteCompletedCommand and CompletedTodosDeleted
 
 Those cases do not carry any information with themselves, so don't need to add any backing field. Cover new cases in `handle` and `apply`.
 
-### Client - add `ClearCompleted` Msg
+### Client - add ClearCompleted Msg
 
 Execute `DeleteCompletedCommand` in `update` for the Msg, call DELETE /todos for the command in `request` without request body
 
-### Client - add `OnClick` handler to the "Clear completed" `button`
+### Client - trigger ClearCompleted Msg
 
-... and `dispatch ClearCompleted` Msg
+Add `OnClick` handler to the "Clear completed" `button` and `dispatch ClearCompleted` Msg
 
-### Server - add handler for DELETE to `todosRouter`
+### Server - add handler for DeleteCompletedCommand
 
-... and execute `DeleteCompletedCommand`
+The handler should be of DELETE method in `todosRouter`. Execute `DeleteCompletedCommand` in the handler.
 
 ## 4. toggle completed for all Todos
 
-### Client - add `toggle-all` checkbox and label
+### Client - add "toggle-all" checkbox and label
 
 We need 2 new UI elements - in `viewTodos` function, before `ul` add 2 elements: 1) `input` with `checkbox` type and `toggle-all` class, 2) `label` without any props or children
 
-### Shared - add `PatchAllCommand` and `AllTodosMarkedAs`
+### Shared - add PatchAllCommand and AllTodosMarkedAs
 
 `PatchAllComand` should come with `PatchDTO`, and the `AllTodosMarkedAs` event with bool flag. Cover the cases in `handle` and `apply`
 
-### Client - add `SetAllCompleted` Msg
+### Client - add SetAllCompleted Msg
 
 The new Msg should have a bool flag. Execute `PatchAllCommand` for the Msg - similar to PatchCommand for single Todo. Call PATCH /todos with `PatchDTO` body for the command.
 
-### Client - add `OnClick` handler to the "toggle-all" **label (!)**
+### Client - trigger SetAllCompleted Msg
+
+Add `OnClick` handler to the "toggle-all" **label (!)**.
 
 The handler needs to be attached to `label` as it's the element that is visible in the browser's window. Then `dispatch SetAllCompleted` Msg. `SetAllCompleted` needs a proper flag - check if all todos are completed (`List.forall` might get handy) and pass that value as argument to the Msg.
 
-### Client - bind Check property for "toggle-all" checkbox
+### Client - bind "toggle-all" checkbox
+
+Use `Checked` property for "toggle-all" checkbox.
 
 `Checked` needs to be true when all Todos are completed. Also add a dummy `OnChange` handler to checkbox (can use `ignore` function) - this is so that we overcome React warnings about uncontrolled inputs (we already attached event handler to the label).
 
-### Server - add handler for PATCH to todosRouter
+### Server - add handler for PatchAllCommand
+
+Http PATCH for todosRouter.
 
 Read `PatchDTO` from the request and call `PatchAllCommand`
 
