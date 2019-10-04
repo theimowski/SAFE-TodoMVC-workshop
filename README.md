@@ -175,12 +175,29 @@ Execute `DeleteCompletedCommand` in `update` for the Msg, call DELETE /todos for
 
 ## 4. toggle completed for all Todos
 
-1. (Client) add UI elements - in `viewTodos` function, before `ul` add 2 elements: 1) `input` with `checkbox` type and `toggle-all` class, 2) `label` with `HtmlFor` property set to `toggle-all`
-1. (Shared) add `PatchAllCommand` with `PatchDTO` and `AllTodosMarkedAs` event with bool flag, cover the cases in `handle` and `apply`
-1. (Client) add `SetAllCompleted` Msg with bool flag, execute `PatchAllCommand` for the Msg, call PATCH /todos with `PatchDTO` body for the command
-1. (Client) add `OnClick` handler to the "toggle-all" **label (!)** and `dispatch SetAllCompleted`
-1. (Client) make the "toggle-all" checkbox checked when all Todos are completed, and add a dummy `OnChange` handler to checkbox (can use `ignore` function) - this is so that we overcome React warnings on uncontrolled inputs
-1. (Server) add handler for PATCH /todos - read `PatchDTO` from request and call `PatchAllCommand`
+* (Client) add `toggle-all` checkbox and label
+
+We need 2 new UI elements - in `viewTodos` function, before `ul` add 2 elements: 1) `input` with `checkbox` type and `toggle-all` class, 2) `label` without any props or children
+
+* (Shared) add `PatchAllCommand` and `AllTodosMarkedAs`
+
+`PatchAllComand` should come with `PatchDTO`, and the `AllTodosMarkedAs` event with bool flag. Cover the cases in `handle` and `apply`
+
+* (Client) add `SetAllCompleted` Msg
+
+The new Msg should have a bool flag. Execute `PatchAllCommand` for the Msg - similar to PatchCommand for single Todo. Call PATCH /todos with `PatchDTO` body for the command.
+
+* (Client) add `OnClick` handler to the "toggle-all" **label (!)**
+
+The handler needs to be attached to `label` as it's the element that is visible in the browser's window. Then `dispatch SetAllCompleted` Msg. `SetAllCompleted` needs a proper flag - check if all todos are completed (`List.forall` might get handy) and pass that value as argument to the Msg.
+
+* (Client) bind Check property for "toggle-all" checkbox
+
+`Checked` needs to be true when all Todos are completed. Also add a dummy `OnChange` handler to checkbox (can use `ignore` function) - this is so that we overcome React warnings about uncontrolled inputs (we already attached event handler to the label).
+
+* (Server) add handler for PATCH to todosRouter
+
+Read `PatchDTO` from the request and call `PatchAllCommand`
 
 ## 5. (*) edit title of a Todo
 
