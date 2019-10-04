@@ -221,7 +221,8 @@ let viewControls model dispatch =
                 str (item + " left") ]
           button
             [ ClassName "clear-completed"
-              Hidden (todosCompleted = 0) ]
+              Hidden (todosCompleted = 0)
+              OnClick (fun _ -> dispatch ClearCompleted) ]
             [ str "Clear completed" ] ]
 
 /// combines all parts into whole
