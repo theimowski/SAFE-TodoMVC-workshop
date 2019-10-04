@@ -39,7 +39,6 @@ There's a `todos.http` file in the repository that shows what HTTP calls we shou
 
 This is another VS Code extension that helps when working with Fable and React - it will colour corresponding opening and closing brackets, making it easier to keep track of bracket nesting level.
 
-
 ## Get the app running
 
 If you choose to install prerequisites locally:
@@ -59,7 +58,7 @@ If using Remote Container:
 1. Invoke `fake build --target run`
 1. Open http://localhost:8080/ in your browser
 
-I also recommend opening developer tools in browser and placing your editor side by side with the browser - the watch mode makes it really nice to work without unnecessary window switching:
+I also recommend opening developer tools in browser and placing your editor side by side with the browser - the watch mode makes it really nice to work without unnecessary window switching. To read the instructions, just open README.md in the editor
 
 ![side by side](img/side_by_side.png)
 
@@ -81,12 +80,13 @@ https://safe-stack.github.io/docs/
 * There's a `todos.http` file in repository which shows what HTTP calls our server should accept. After every feature make sure to check you can work with the application both via Web UI and the HTTP API!
 * For simplicity, all server HTTP calls will return whole list of new Todos.
 * We kinda follow the DDD approach - using Commands and Events for our Todo domain.
-* We're interested in 5 files:
-    * Shared.fs
-    * Client.fs
-    * Server.fs
-    * todos.http
-    * filestore.json
+* We're interested in following files:
+    * src/Shared/Shared.fs - code that will be shared (reused) between Client and Server (compiles to ASP.NET Core and JavaScript)
+    * src/Client/Client.fs - code for Client (compiles to JavaScript)
+    * src/Server/Server.fs - code for Server (compiles to ASP.NET Core)
+    * src/Server/filestore.json - our file-based databse
+    * todos.http - running specifications for the Server
+    * README.md - instructions
 
 ## 0. display Todos + add new Todo
 
