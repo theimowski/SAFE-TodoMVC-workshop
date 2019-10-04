@@ -213,31 +213,56 @@ If we call DELETE /todo/{id} multiple times (from REST Client), we'll get a 500 
 
 ## 2. toggle completed for a Todo
 
-### Client - in `viewTodo`, just before `label` add an `input` with `checkbox` type and `toggle` class
+### Client - add "toggle" checkbox
 
-Use `Type` and `ClassName` React props. Note `input` tag can't have children so use only first list for properties and skip second list! Observe how a rounded checkbox is added in front of the label for each Todo.
+In `viewTodo`, just before `label` add an `input` with `checkbox` type and `toggle` class.
 
-### Shared - add `PatchDTO` type with `Completed` field and add `PatchCommand` with a tuple of `Guid` and `PatchDTO`
+Use `Type` and `ClassName` React props. Note `input` tag can't have children so use only first list for properties and skip the second list!
 
-For `PatchDTO` use Record type - same as was used for `AddDTO`. Record is the "product type" in F# and can have multiple named fields. `PatchDTO` should have a single `Completed` field of `bool` type. `PatchCommand` should take a tuple as a backing field : `Guid * PatchDTO` - the asterisk stands for defining a tuple in type signature.
+Observe how a rounded checkbox is added in front of the label for each Todo.
 
-### Shared - add `TodoPatched` event and cover new cases for `handle` and `apply`
+### Shared - add PatchCommand
 
-The `TodoPatched` event can have whole `Todo` as a backing field - it will make it simpler for `apply` function. For `handle` and `PatchCommand` remember to check if todo exists (like for `DeleteCommand`). When pattern matching, you can deconstruct a tuple like this: `| PatchCommand (id, patchDTO) ->`. To return a copy of a Todo with single field changed use following syntax: `{ todo with Completed = ... }`. For `TodoPatched` in `apply` - use `List.map`, check if Id matches and return either current or patched value of a Todo - you can use `if ... then ... else ...`.
+Add `PatchDTO` type with `Completed` field and add `PatchCommand` with a tuple of `Guid` and `PatchDTO`.
 
-### Client - add `SetCompleted` Msg with Id and flag (`bool`); in `update` function handle this case and `execute` the `PathCommand`
+For `PatchDTO` use Record type - same as was used for `AddDTO`. Record is the "product type" in F# and can have multiple named fields.
+
+`PatchDTO` should have a single `Completed` field of `bool` type. `PatchCommand` should take a tuple as a backing field : `Guid * PatchDTO` - the asterisk stands for defining a tuple in type signature.
+
+### Shared - add TodoPatched
+
+Add `TodoPatched` event and cover new cases for `handle` and `apply`.
+
+The `TodoPatched` event can have whole `Todo` as a backing field - it will make it simpler for `apply` function. For `handle` and `PatchCommand` remember to check if todo exists (like for `DeleteCommand`).
+
+When pattern matching, you can deconstruct a tuple like this: `| PatchCommand (id, patchDTO) ->`.
+
+To return a copy of a Todo with single field changed use following syntax: `{ todo with Completed = ... }`.
+
+For `TodoPatched` in `apply` - use `List.map`, check if Id matches and return either current or patched value of a Todo - you can use `if ... then ... else ...`.
+
+### Client - add SetCompleted Msg
+
+Add `SetCompleted` Msg with Id and flag (`bool`). In `update` function handle this case and `execute` the `PathCommand`.
 
 Again use a tuple for backing field of `SetCompleted` (`Guid * bool`). In `update` follow pattern from `Add` Msg - create an instance of `PatchDTO`, pass it to `PatchCommand` and execute.
 
-### Client - use `Checked` property to mark the "toggle" checkbox when corresponding Todo is completed; add also `OnChange` handler and `dispatch` `SetCompleted` Msg
+### Client - trigger SetCompleted Msg
+
+Use `Checked` property to mark the "toggle" checkbox when corresponding Todo is completed.
+Add also `OnChange` handler and `dispatch` `SetCompleted` Msg.
 
 `Checked` React prop takes a flag as argument - use `todo.Completed` to determine if it should be checked or not. To construct instance of `SetCompleted` you need to pass a tuple of Todo's Id an **negated** value of it's current Completed status - use `not` function (`bool -> bool`).
 
-### Client - handle `PatchCommand` in `request` function
+### Client - send request for PatchCommand
+
+Handle `PatchCommand` in `request` function.
 
 Call PATCH /todo/{id} with `PatchDTO` as body (`Some patchDTO`)
 
-### Server - add handler for PATCH to `todoRouter`
+### Server - add handler PatchCommand
+
+The handler should be for PATCH http method to `todoRouter`.
 
 Read `PatchDTO` from the request - use `ctx.BindModelAsync<PatchDTO>()`. Construct value of `PatchCommand` and execute it, using same function as for `delete`.
 
