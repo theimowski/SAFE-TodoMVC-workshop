@@ -45,6 +45,11 @@ let todosRouter = router {
         task {
             return! execute DeleteCompletedCommand next ctx
         })
+    patch "" (fun next ctx ->
+        task {
+            let! patchDTO = ctx.BindModelAsync<PatchDTO>()
+            return! execute (PatchAllCommand patchDTO) next ctx
+        })
 }
 
 /// handles HTTP requests with a given method to /todo/{id} endpoint
