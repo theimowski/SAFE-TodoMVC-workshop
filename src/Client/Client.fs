@@ -201,6 +201,8 @@ let viewTodos model dispatch =
     let cssVisibility =
         if List.isEmpty todos then "hidden" else "visible"
 
+    let allCompleted = todos |> List.forall (fun t -> t.Completed)
+
     section
       [ ClassName "main"
         Style [ Visibility cssVisibility ]]
@@ -208,7 +210,7 @@ let viewTodos model dispatch =
             [ Type "checkbox"
               ClassName "toggle-all" ]
         label
-            [ ]
+            [ OnClick (fun _ -> SetAllCompleted (not allCompleted) |> dispatch) ]
             [ ]
         ul
           [ ClassName "todo-list" ]
