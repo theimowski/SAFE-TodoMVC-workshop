@@ -196,7 +196,13 @@ let viewTodos model dispatch =
     section
       [ ClassName "main"
         Style [ Visibility cssVisibility ]]
-      [ ul
+      [ input
+            [ Type "checkbox"
+              ClassName "toggle-all" ]
+        label
+            [ ]
+            [ ]
+        ul
           [ ClassName "todo-list" ]
           [ for todo in todos ->
                 viewTodo todo dispatch ] ]
