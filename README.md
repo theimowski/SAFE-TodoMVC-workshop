@@ -69,17 +69,38 @@ I also recommend opening developer tools in browser and placing your editor side
 * **F**able for running F# in the web browser
 * **E**lmish for client-side user interfaces
 
-
 https://safe-stack.github.io/docs/
+
+## Todo MVC
+
+Original Todo MVC project (Client-side): http://todomvc.com/
+
+Todo MVC for Server: https://www.todobackend.com
+
+We combine both in single language (F#) using SAFE Stack.
 
 ## Important notes
 
 * Implementation of the workshop is on `solution` branch - follow commits on that branch to see my solution for every feature and every single task. This might be helpful when in doubt or stuck.
-* We'll skip the Azure integration part - not enough time and would require everyone to have their Azure accounts properly set up. Beware Azure is obviously not the only option of hosting SAFE applications.
+* The no 0. features (display Todos and add new Todo) are already implemented on master branch which is the starting point of this workshop. I'll demonstrate how those features were implemented.
+* We aim to complete at least features 1. and 2. - plan is to make checkpoints for those.
+* Will be great if you manage to implement features 3. and 4.
+* Feature (*) 5. is bit harder - feel free to treat it as homework
+* We'll skip the Azure integration part - not enough time and would require everyone to have their Azure accounts properly set up. Beware Azure is obviously not the only option to host SAFE applications.
 * We'll be using a file-based database, just for demo purposes - the file is called `filestore.json`, it's indexed in Git - you can browse it to see all Todos.
 * There's a `todos.http` file in repository which shows what HTTP calls our server should accept. After every feature make sure to check you can work with the application both via Web UI and the HTTP API!
-* For simplicity, all server HTTP calls will return whole list of new Todos.
-* We kinda follow the DDD approach - using Commands and Events for our Todo domain.
+* For simplicity, all server HTTP calls will return whole list of new Todos in JSON format.
+* The script we run (`fake build -t run`) runs in a "watch" mode - this means that every time we save either of our source files, the app gets recompiled and rerun automatically. This applies to all Shared, Client and Server.
+  * When saving Shared both Client and Server will get recompiled
+  * The Client changes should be visible almost immediately
+  * The Server recompiles a bit longer, so make sure to follow output of the script - it's ready when following is printed:
+
+```
+Now listening on: http://0.0.0.0:8085
+Application started. Press Ctrl+C to shut down.
+```
+
+* There are actually 2 servers running: our Saturn Web Server on 8085 and Webpack Dev Server on 8080 - we can focus just on the latter one
 * We're interested in following files:
     * src/Shared/Shared.fs - code that will be shared (reused) between Client and Server (compiles to ASP.NET Core and JavaScript)
     * src/Client/Client.fs - code for Client (compiles to JavaScript)
@@ -87,6 +108,14 @@ https://safe-stack.github.io/docs/
     * src/Server/filestore.json - our file-based databse
     * todos.http - running specifications for the Server
     * README.md - instructions
+* We kinda follow the DDD approach - using Commands and Events for our Todo domain.
+* There's a pattern we'll follow throughout implementing all of the features:
+  1. Client - change UI to adapt new feature, observe live changes in browser
+  1. Shared - add new Command and Event and implement our Domain logic
+  1. Client - add new Msg (triggered from UI) and execute proper Domain Command
+  1. Client - determine what HTTP request should be called for the Command
+  1. Client - trigger the Msg from UI
+  1. Server - add a handler for HTTP request and execute proper Domain Command
 
 ## 0. display Todos + add new Todo
 
@@ -94,49 +123,91 @@ These features are already implemented on master branch.
 
 ## 1. delete a Todo
 
-### Client - in `viewTodo`, just after the `label` add a `button` with `destroy` class.
+### Client - add "destroy" button
 
-F# is whitespace sensitive (like e.g. Python), so make sure you got the indents right - `button` should start in same column as `label`. When working with React and Elmish, square brackets used for creating lists can get cumbersome - make sure you get them right, otherwise you might experience unwanted compiler errors! First list applied to an element stands for its properties (React props) - that's where you should place the `ClassName`, and the second list stands for the element's children (empty in this case). Note how a red cross appears in the UI when you move your mouse over a todo.
+In `viewTodo`, just after the `label` add a `button` with `destroy` class.
 
-### Shared - add `DeleteCommand` with Id of a Todo (`Guid` type) and `TodoDeleted` event with a `Todo`
+F# is whitespace sensitive (like e.g. Python), so make sure you got the indents right - `button` should start in same column as `label`.
 
-The `Command` and `Event` types are represented as what we call Discriminated Unions in F#. Think of them as the sum types from the Functional Programming jargon. When I say "`DeleteCommand` with Id" I mean new Discriminated union case with a backing field - to add new case, we write `| NewCase` (remember about whitespace sensitivity!) and then (optionally) we list the types for backing fields after `of` keyword: `| NewCase of Guid`
+When working with React and Elmish, square brackets used for creating lists can get cumbersome - make sure you get them right, otherwise you might experience unwanted compiler errors! First list applied to an element stands for its properties (React props) - that's where you should place the `ClassName`, and the second list stands for the element's children (empty in this case).
 
-### Shared - in `handle` function cover case for new command - use `List.find` to grab a Todo with given id and create `TodoDeleted` event
+Note how a red cross appears in the UI when you move your mouse over a todo.
 
-`match {expression} with` is a pattern matching clause in F#. We can use it to cover all Discriminated Union cases - see how `AddCommand` case is covered and follow that pattern for `DeleteCommand`. You might use `let todo = ...` binding to find a Todo. We also need to return `Result` - so for now assume `Ok` case. Use pipe (`|>`) operator to apply value on the left side to function on right hand side.
+### Shared - add DeleteCommand and TodoDeleted event
 
-### Shared - in `apply` function cover case for new event - use `List.filter` to remove Todo that has the given Id
+`DeleteCommand` with Id of a Todo (`Guid` type) and `TodoDeleted` event with a `Todo`.
 
-Again using pattern matching, we'll cover case for `TodoDeleted`. The return type of `apply` is `Todo list` - last expression in F# is always the return value (no need for explicit `return` keyword). We can "pipe" todod: `todos |> ...` to `List.filter` with a lambda function (predicate) checking for Id equality - use `<>` operator to see if Ids are different.
+The `Command` and `Event` types are represented as what we call Discriminated Unions in F#. Think of them as the sum types from the Functional Programming jargon.
 
-### Client - add `Destroy` Msg with Id of a Todo (`Guid`)
+When I say "`DeleteCommand` with Id" I mean new Discriminated union case with a backing field - to add new case, we write `| NewCase` (remember about whitespace sensitivity!) and then (optionally) we list the types for backing fields after `of` keyword: `| NewCase of Guid`
 
-The Msg `type` in Client stands for all possible actions in our UI - make sure you can tell the difference between the Msg and Command, they're not the same! When we click the red cross button, we'll need to trigger that Msg.
+### Shared - handle DeleteCommand
 
-### Client - in `update` function handle new Msg - execute `DeleteCommand`
+In `handle` function cover case for new command - use `List.find` to grab a Todo with given id and create `TodoDeleted` event.
 
-Yet again pattern matching - follow the pattern as per `Add` Msg. We need to return a tuple of new model and Cmd (Cmd and our Command in Shared module are also different things - naming is hard!). To return a tuple simply do `model, cmd` (comma creates a tuple) - note that we don't need to change the model here so we return it unchanged. To execute `DeleteCommand` we first need to create it by passing the Id of a Todo and then calling `execute` function.
+`match {expression} with` is a pattern matching clause in F#. We can use it to cover all Discriminated Union cases - see how `AddCommand` case is covered and follow that pattern for `DeleteCommand`. You might use `let todo = ...` binding to find a Todo.
 
-### Client - add `OnClick` event handler to the "destroy" button and `dispatch` a `Destroy` msg with todo's Id
+We also need to return `Result` - so for now assume `Ok` case. Use pipe (`|>`) operator to apply value on the left side to function on right hand side.
 
-`OnClick` is another React prop that we can add. It takes a function as a parameter - same as event handlers in `viewInput` function above. Follow the pattern from `viewInput` to dispatch the `Destroy` Msg. To create the Msg you'll need to pass the Todo's Id - you can get it by using dot notation (`todo.Id`) - `todo` is a parameter to our `viewTodo` function.
+### Shared - apply TodoDeleted
 
-### Client - in `request` function handle `DeleteCommand` - call DELETE /todo/{id} without body
+In `apply` function cover case for new event - use `List.filter` to remove Todo that has the given Id.
 
-This is where we call HTTP request to our server - follow the pattern from `AddCommand` case: use `fetch` function with proper parameters. To construct /todo/{id} url, call `todo` function with the given Id. The `fetch` function takes optional request body as last parameter. For this call we don't need the body so pass `None` as last param.
+Again using pattern matching, we'll cover case for `TodoDeleted`. The return type of `apply` is `Todo list` - last expression in F# is always the return value (no need for explicit `return` keyword).
+
+We can "pipe" todos: `todos |> ...` to `List.filter` with a lambda function (predicate) checking for Id equality. Use `<>` operator to see if Ids are different.
+
+### Client - add Destroy Msg
+
+The `Destroy` Msg should come with Id of a Todo (`Guid`).
+
+The Msg `type` in Client stands for all possible actions in our UI - make sure you can tell the difference between the Msg and Command, they're not the same!
+
+When we click the red cross button, we'll need to trigger that Msg.
+
+### Client - handle Destroy Msg
+
+In `update` function handle new Msg - execute `DeleteCommand`.
+
+Yet again pattern matching - follow the pattern as per `Add` Msg. We need to return a tuple of new model and Cmd (Cmd and our Command in Shared module are also different things - naming is hard!). To return a tuple simply do `model, cmd` (comma creates a tuple) - note that we don't need to change the model here so we return it unchanged.
+
+To execute `DeleteCommand` we first need to create it by passing the Id of a Todo and then calling `execute` function.
+
+### Client - trigger Destroy Msg
+
+Add `OnClick` event handler to the "destroy" button and `dispatch` a `Destroy` msg with Todo's Id.
+
+`OnClick` is another React prop that we can add. It takes a function as a parameter - same as event handlers in `viewInput` function above.
+
+Follow the pattern from `viewInput` to dispatch the `Destroy` Msg. To create the Msg you'll need to pass the Todo's Id - you can get it by using dot notation (`todo.Id`) - `todo` is a parameter to our `viewTodo` function.
+
+### Client - send request for DeleteCommand
+
+In `request` function handle `DeleteCommand` - call DELETE /todo/{id} without body.
+
+This is where we call HTTP request to our server. Follow the pattern from `AddCommand` case: use `fetch` function with proper parameters. To construct /todo/{id} url, call `todo` function with the given Id.
+
+The `fetch` function takes optional request body as last parameter. For this call we don't need the body so pass `None` as last param.
+
 By now we should be able to delete a todo from the Web app, however we are still missing proper handling on server side, so the change will not be persisted.
 
-### Server - add handler for DELETE to `todoRouter` - execute `DeleteCommand`
+### Server - add handler for DeleteCommand
 
-Follow the pattern for POST from `todosRouter`. We don't need to do `BindModelAsync` as there's no request body. Just change `AddCommand` with `DeleteCommand`. We can take the Id from `todoRouter` parameter.
-Now we should be able to remove a Todo server-side.
+Add DELETE handler to `todoRouter` and execute `DeleteCommand`.
 
-### Shared - add `TodoNotFound` error and in `handle` function replace `List.find` with `List.tryFind` to properly handle missing todo error
+Follow the pattern for POST from `todosRouter`. We don't need to do `BindModelAsync` as there's no request body. Just replace `AddCommand` with `DeleteCommand`. We can take the Id from `todoRouter` parameter.
 
-As one could call our API for a non-existing Todo, we need to handle that case. After using `List.tryFind` we can utilise pattern matching to see if Todo exists (`Some todo` case) or not (`None` case) - correspondingly call `Ok` or `Error` (see `AddCommand` case)
+Now we should be able to remove a Todo server-side, but still missing error handling.
 
-### Server - in `execute` function for `TodoNotFound` return HTTP 404 `notFound`
+### Shared - add TodoNotFound error
+
+In `handle` function replace `List.find` with `List.tryFind` to properly handle missing todo error.
+
+As one could call our API for a non-existing Todo, we need to handle that case. After using `List.tryFind` we can utilise pattern matching to see if Todo exists (`Some todo` case) or not (`None` case) - correspondingly call `Ok` or `Error` (see `AddCommand`).
+
+### Server - map TodoNotFound to HTTP response
+
+In `execute` function for `TodoNotFound` return HTTP 404 `notFound`.
 
 If we call DELETE /todo/{id} multiple times (from REST Client), we'll get a 500 Internal Error due to not complete pattern matching. Fix that by handling `TodoNotFound` inside `execute` function - follow pattern for `TodoIdAlreadyExists`.
 
