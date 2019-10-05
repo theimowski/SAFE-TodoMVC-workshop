@@ -33,11 +33,11 @@ Required when working with local prerequisites. Provides language support for F#
 
 #### Rest client
 
-There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. The "REST Client" extension for VS Code integrates with this file. Alternatively you can use any other HTTP client of your preference (Postman etc.)
+There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. The "REST Client" extension for VS Code integrates nicely with this file allowing you to send the request directly from VS Code. Alternatively you can use any other HTTP client of your preference (e.g Postman)
 
 #### Rainbow Brackets
 
-This is another VS Code extension that helps when working with Fable and React - it will colour corresponding opening and closing brackets, making it easier to keep track of bracket nesting level.
+This VS Code extension helps when working with Fable and React - it will colour corresponding opening and closing brackets, making it easier to keep track of bracket nesting level.
 
 ## Get the app running
 
@@ -53,7 +53,7 @@ If you choose to install prerequisites locally:
 If using Remote Container:
 
 1. Open repository directory in VS Code
-1. Click "Reopen in container" in a pop-up window
+1. Click "Reopen in container" in a pop-up window, or invoke that action from Command Pallete
 1. Open VS Code terminal, it should attach to the container
 1. Invoke `fake build --target run`
 1. Open http://localhost:8080/ in your browser
@@ -65,7 +65,7 @@ I also recommend opening developer tools in browser and placing your editor side
 ## SAFE Stack
 
 * **S**aturn for back-end services in F#
-* **A**zure as a hosting platform plus associated platform services
+* **A**zure as a hosting platform plus associated platform services (we'll skip this part during the workshop)
 * **F**able for running F# in the web browser
 * **E**lmish for client-side user interfaces
 
@@ -81,31 +81,31 @@ We combine both in single language (F#) using SAFE Stack.
 
 ## Important notes
 
-* Implementation of the workshop is on `solution` branch - follow commits on that branch to see my solution for every feature and every single task. This might be helpful when in doubt or stuck.
-* The no 0. features (display Todos and add new Todo) are already implemented on master branch which is the starting point of this workshop. I'll demonstrate how those features were implemented.
-* We aim to complete at least features 1. and 2. - plan is to make checkpoints for those.
-* Will be great if you manage to implement features 3. and 4.
-* Feature (*) 5. is bit harder - feel free to treat it as homework
+* Implementation of the workshop is on `solution` branch - follow commits on that branch to check how I implemented the features and every single task. E.g. for `Client - add "destroy" button` task, there's a corresponding commit with same message. This might be helpful when in doubt or stuck. Obviously feel free to provide your own implementation - just follow the specifications!
+* The "display all Todos" and "add new Todo" features are already implemented on master branch which is the starting point of this workshop. I'll demonstrate how those features were implemented during the workshop.
+* We aim to complete at least features 1. and 2. during the workshop
+* Will be great if you manage to implement also features 3. and 4.
+* Feature (*) 5. is bit harder and will require more effort. Complete that feature anytime as a homework.
 * We'll skip the Azure integration part - not enough time and would require everyone to have their Azure accounts properly set up. Beware Azure is obviously not the only option to host SAFE applications.
-* We'll be using a file-based database, just for demo purposes - the file is called `filestore.json`, it's indexed in Git - you can browse it to see all Todos.
+* We'll be using a file-based database, just for demo purposes - the file is called `filestore.json` and it's indexed in Git - you can browse it to see all Todos.
 * There's a `todos.http` file in repository which shows what HTTP calls our server should accept. After every feature make sure to check you can work with the application both via Web UI and the HTTP API!
 * For simplicity, all server HTTP calls will return whole list of new Todos in JSON format.
 * The script we run (`fake build -t run`) runs in a "watch" mode - this means that every time we save either of our source files, the app gets recompiled and rerun automatically. This applies to all Shared, Client and Server.
-  * When saving Shared both Client and Server will get recompiled
+  * When saving Shared, both Client and Server will get recompiled
   * The Client changes should be visible almost immediately
-  * The Server recompiles a bit longer, so make sure to follow output of the script - it's ready when following is printed:
+  * The Server recompiles a bit longer, so make sure to follow output of the build script - it's ready when following is printed:
 
 ```
 Now listening on: http://0.0.0.0:8085
 Application started. Press Ctrl+C to shut down.
 ```
 
-* There are actually 2 servers running: our Saturn Web Server on 8085 and Webpack Dev Server on 8080 - we can focus just on the latter one
+* There are actually 2 servers running in development watch mode: our Saturn Web Server on 8085 and Webpack Dev Server on 8080 - we can focus just on the latter one
 * We're interested in following files:
     * src/Shared/Shared.fs - code that will be shared (reused) between Client and Server (compiles to ASP.NET Core and JavaScript)
     * src/Client/Client.fs - code for Client (compiles to JavaScript)
     * src/Server/Server.fs - code for Server (compiles to ASP.NET Core)
-    * src/Server/filestore.json - our file-based databse
+    * src/Server/filestore.json - our file-based database
     * todos.http - running specifications for the Server
     * README.md - instructions
 * We kinda follow the DDD approach - using Commands and Events for our Todo domain.
