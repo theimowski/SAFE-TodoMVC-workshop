@@ -113,9 +113,9 @@ Application started. Press Ctrl+C to shut down.
   1. Client - change UI to adapt new feature, observe live changes in browser
   1. Shared - add new Command and Event and implement our Domain logic
   1. Client - add new Msg (triggered from UI) and execute proper Domain Command
-  1. Client - determine what HTTP request should be called for the Command
+  1. Client - call HTTP request for the given Command
   1. Client - trigger the Msg from UI
-  1. Server - add a handler for HTTP request and execute proper Domain Command
+  1. Server - add a handler for HTTP request and execute proper Command
 
 ## 0. display Todos + add new Todo
 

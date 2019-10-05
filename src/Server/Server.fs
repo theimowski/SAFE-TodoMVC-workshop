@@ -7,19 +7,27 @@ open Saturn
 
 open Shared
 
+/// our file database
 let store = FileStore.FileStore()
 
+/// Execute a Command Server-side.
+/// If the result is an Event, apply it to get new Todo list,
+/// save new Todos in our store and return them as JSON.
+/// If the result is an Error, map it to a proper HTTP status code and reponse body
 let execute (command: Command) next ctx =
     task {
         let todos = store.GetTodos()
         match Todos.handle command todos with
         | Ok event ->
-            let todos' = store.Apply event
+            let todos = store.GetTodos()
+            let todos' = Todos.apply event todos
+            store.SaveTodos todos'
             return! json todos' next ctx
         | Error TodoIdAlreadyExists ->
             return! Response.conflict ctx "Todo with same Id already exists!"
     }
 
+/// handles HTTP requests with a given method to /todos endpoint
 let todosRouter = router {
     get "" (fun next ctx ->
         task {
@@ -33,6 +41,7 @@ let todosRouter = router {
         })
 }
 
+/// handles HTTP requests with a given method to /todo/{id} endpoint
 let todoRouter (id: Guid) = router {
     get "" (fun next ctx ->
         task {
@@ -45,11 +54,13 @@ let todoRouter (id: Guid) = router {
         })
 }
 
+/// forward endpoints to proper routers
 let webApp = router {
     forward "/api/todos" todosRouter
     forwardf "/api/todo/%O" todoRouter
 }
 
+/// creates the application
 let app = application {
     url "http://0.0.0.0:8085/"
     use_router webApp

@@ -8,11 +8,11 @@ open Shared
 
 type FileStoreMsg =
     | Get of AsyncReplyChannel<Todo list>
-    | Apply of Event * AsyncReplyChannel<Todo list>
+    | Save of Todo list
 
 type FileStore () =
     let fileName = "filestore.json"
-    let getTodos () =
+    let getTodos () : Todo list =
         try
             let rawJSON = File.ReadAllText(fileName)
             Decode.Auto.unsafeFromString(rawJSON)
@@ -31,14 +31,11 @@ type FileStore () =
                     let todos = getTodos()
                     channel.Reply todos
                     return! loop ()
-                | Apply (event, channel) ->
-                    let todos = getTodos()
-                    let todos' = Todos.apply event todos
-                    saveTodos todos'
-                    channel.Reply todos'
+                | Save todos ->
+                    saveTodos todos
                     return! loop ()
             }
         loop ())
 
     member __.GetTodos() = mb.PostAndReply Get
-    member __.Apply(event) = mb.PostAndReply (fun ch -> Apply(event, ch))
+    member __.SaveTodos(todos) = mb.Post (Save todos)
