@@ -17,16 +17,24 @@ open Shared
 
 // Model
 
+/// This type keeps track of the state on client side.
+/// In addition to list of Todos, we also keep track of
+/// the value of text input field (for adding new Todo).
 type Model =
     { Todos : Todo list
       Input : string }
 
 // Messages
 
+/// This types denotes all possible actions on Client side.
 type Msg =
+    // When app starts, we call GET /todos.
+    // This Msg comes when a response is received
     | TodosFetched of Todo list
+    // Two Msgs for handling our domain logic
     | ExecuteCommand of Command
     | EventApplied of Todo list
+    // Following Msgs are triggered from the UI itself
     | UpdateInput of string
     | Add
 
