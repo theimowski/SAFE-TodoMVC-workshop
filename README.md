@@ -29,15 +29,15 @@ Following should be already preinstalled if you opted for the Remote Container o
 
 #### Ionide-fsharp
 
-Required when working with local prerequisites. Provides language support for F#.
+Required when working with local prerequisites. Provides language support for F#. [link](https://marketplace.visualstudio.com/items?itemName=Ionide.Ionide-fsharp)
 
 #### Rest client
 
-There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. The "REST Client" extension for VS Code integrates nicely with this file allowing you to send the request directly from VS Code. Alternatively you can use any other HTTP client of your preference (e.g Postman)
+There's a `todos.http` file in the repository that shows what HTTP calls we should be able to make to our server. The "REST Client" extension for VS Code integrates nicely with this file allowing you to send the request directly from VS Code - [link](https://marketplace.visualstudio.com/items?itemName=humao.rest-client). Alternatively you can use any other HTTP client of your preference (e.g Postman)
 
 #### Rainbow Brackets
 
-This VS Code extension helps when working with Fable and React - it will colour corresponding opening and closing brackets, making it easier to keep track of bracket nesting level.
+This VS Code extension helps when working with Fable and React - it will colour corresponding opening and closing brackets, making it easier to keep track of bracket nesting level. [link](https://marketplace.visualstudio.com/items?itemName=2gua.rainbow-brackets)
 
 ## Get the app running
 
@@ -79,19 +79,24 @@ Todo MVC for Server: https://www.todobackend.com
 
 We combine both in single language (F#) using SAFE Stack.
 
-## Important notes
+## Key points
 
-* Implementation of the workshop is on `solution` branch - follow commits on that branch to check how I implemented the features and every single task. E.g. for `Client - add "destroy" button` task, there's a corresponding commit with same message. This might be helpful when in doubt or stuck. Obviously feel free to provide your own implementation - just follow the specifications!
-* The "display all Todos" and "add new Todo" features are already implemented on master branch which is the starting point of this workshop. I'll demonstrate how those features were implemented during the workshop.
+* Workshop will focus on the fact we can share code between Client and Server
+* We'll not do the Azure part
+* Check `solution` branch for example solution when in doubt or stuck. Every commit represents a single task (E.g. for `Client - add "destroy" button` task there's a commit with same message). Obviously feel free to provide your own implementation - just follow the specifications!
+* The "display all Todos" and "add new Todo" features are already implemented on master branch which is the starting point of this workshop. I'll demonstrate how those features were implemented at the start of the workshop.
 * We aim to complete at least features 1. and 2. during the workshop
 * Will be great if you manage to implement also features 3. and 4.
 * Feature (*) 5. is bit harder and will require more effort. Complete that feature anytime as a homework.
-* We'll skip the Azure integration part - not enough time and would require everyone to have their Azure accounts properly set up. Beware Azure is obviously not the only option to host SAFE applications.
+
+## Project structure & implementation details
+
 * We'll be using a file-based database, just for demo purposes - the file is called `filestore.json` and it's indexed in Git - you can browse it to see all Todos.
 * There's a `todos.http` file in repository which shows what HTTP calls our server should accept. After every feature make sure to check you can work with the application both via Web UI and the HTTP API!
 * For simplicity, all server HTTP calls will return whole list of new Todos in JSON format.
 * The script we run (`fake build -t run`) runs in a "watch" mode - this means that every time we save either of our source files, the app gets recompiled and rerun automatically. This applies to all Shared, Client and Server.
   * When saving Shared, both Client and Server will get recompiled
+  * Ionide might sometimes not refresh Client/Server when editing Shared - if that's the case, try reopening the source file
   * The Client changes should be visible almost immediately
   * The Server recompiles a bit longer, so make sure to follow output of the build script - it's ready when following is printed:
 
@@ -109,6 +114,7 @@ Application started. Press Ctrl+C to shut down.
     * todos.http - running specifications for the Server
     * README.md - instructions
 * We kinda follow the DDD approach - using Commands and Events for our Todo domain.
+* We execute a Command both on Client and Server side - the Client updates immediately and doesn't wait for response (when the response comes back we just check we're in sync). We could execute the Commands only Server side and wait for a response, but then the Client application could be unresponsive!
 * There's a pattern we'll follow throughout implementing all of the features:
   1. Client - change UI to adapt new feature, observe live changes in browser
   1. Shared - add new Command and Event and implement our Domain logic
@@ -356,11 +362,11 @@ Steps described here will not be as precise as before, and they are not necessar
 
 ## 6. (**) extras
 
-Following are left as an optional exercises, they are possible improvements on what we already have, and are part of the original TodoMVC project specifications.
+Following are left as an optional exercises, they are possible improvements on what we already have, and some are part of the original TodoMVC project specifications.
 They might be bit harder to do as I haven't prepared sample code for those (yet).
 
 * add validation that Todo's title should never be empty
 * when editing a Todo, respect also `Blur` event to save changes
 * implement Routing as per [TodoMVC specs](https://github.com/tastejs/todomvc/blob/master/app-spec.md#routing) - use [Fable.Elmish.Browser](https://elmish.github.io/browser/index.html) package
 * make the edit input focused when entering editing mode - one way of doing that is using [React Refs](https://pl.reactjs.org/docs/refs-and-the-dom.html) - you'll need an advanced usage of `Fable.React` as described e.g. [here](https://fable.io/blog/Announcing-Fable-React-5.html)
-* deploy to Azure App Engine - the project has been created with arm.template, so if you have an Azure account follow [these](https://safe-stack.github.io/docs/template-appservice/) steps to deploy the TodoMVC app to cloud!
+* deploy to Azure App Engine - the project has been created with `arm-template.json` file, so if you have an Azure account follow [these](https://safe-stack.github.io/docs/template-appservice/) steps to deploy the TodoMVC app to cloud!
