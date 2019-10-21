@@ -16,6 +16,7 @@ type AddDTO =
 /// we'll follow a suffix convention, e.g. `AddCommand`
 type Command =
     | AddCommand of AddDTO
+    | DeleteCommand of Guid
 
 /// Todo is the main type in our domain.
 /// We'll use `Todo list` type to keep track of all Todos.
@@ -29,12 +30,14 @@ type Todo =
 /// We use past tense for naming those, e.g. `TodoAdded`.
 type Event =
     | TodoAdded of Todo
+    | TodoDeleted of Todo
 
 /// Error is part of our domain.
 /// It can be a result of executing a Command from invalid state.
 /// E.g. `TodoIdAlreadyExists` when trying to add a Todo with duplicate Id.
 type Error =
     | TodoIdAlreadyExists
+    | TodoNotFound
 
 /// Todos module is there for our domain logic
 module Todos =
@@ -54,6 +57,12 @@ module Todos =
                       Title = addDTO.Title
                       Completed = false }
                 TodoAdded todo |> Ok
+        | DeleteCommand id ->
+            let todo = todos |> List.tryFind (fun t -> t.Id = id)
+            match todo with
+                | None -> Error TodoNotFound
+                | Some x -> TodoDeleted x |> Ok
+
 
     /// apply takes current state (Todo list) and an Event
     /// and returns next state (Todo list)
@@ -63,3 +72,5 @@ module Todos =
         match event with
         | TodoAdded todo ->
             todos @ [ todo ]
+        | TodoDeleted todo ->
+            todos |> List.filter (fun x -> x.Id <> todo.Id)

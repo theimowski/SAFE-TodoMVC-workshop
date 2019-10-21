@@ -25,6 +25,8 @@ let execute (command: Command) next ctx =
             return! json todos' next ctx
         | Error TodoIdAlreadyExists ->
             return! Response.conflict ctx "Todo with same Id already exists!"
+        | Error TodoNotFound ->
+            return! Response.notFound ctx "Todo does not exist!"
     }
 
 /// handles HTTP requests with a given method to /todos endpoint
@@ -51,6 +53,10 @@ let todoRouter (id: Guid) = router {
                 return! json todo next ctx
             | None ->
                 return! Response.notFound ctx "Todo not found!"
+        })
+    delete "" (fun next ctx ->
+        task {
+            return! execute (DeleteCommand id) next ctx
         })
 }
 

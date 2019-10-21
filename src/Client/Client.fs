@@ -39,6 +39,7 @@ type Msg =
     // We're mostly interested in those
     | UpdateInput of string
     | Add
+    | Destroy of Guid
 
 // Fetch
 
@@ -66,6 +67,7 @@ let fetchTodos () = fetch HttpMethod.GET todos None
 let request (command: Command) =
     match command with
     | AddCommand addDTO -> fetch HttpMethod.POST todos (Some addDTO)
+    | DeleteCommand id -> fetch HttpMethod.DELETE (todo id) None
 
 // Initial Model and Elmish Cmd
 
@@ -129,6 +131,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
               Title = model.Input }
         let cmd = execute (AddCommand addDTO)
         { model with Input = "" }, cmd
+    | Destroy id -> model, execute (DeleteCommand id)
 
 // View
 
@@ -159,7 +162,14 @@ let viewTodo (todo: Todo) dispatch =
         [ ClassName "view" ]
         [ label
             [ ]
-            [ str todo.Title ] ] ]
+            [ str todo.Title ]
+          button
+            [ ClassName "destroy"
+              OnClick (fun _ -> dispatch (Destroy todo.Id)) ]
+            []
+        ]
+    ]
+
 
 /// displays whole list of Todos
 let viewTodos model dispatch =
